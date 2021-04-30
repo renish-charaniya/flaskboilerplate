@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="5" time="3.309" timestamp="2021-04-30T17:05:00.778545" hostname="RENISH"><testcase classname="flaskboilerplate.tests.functional.test_main" name="test_home_page" time="0.085" /><testcase classname="flaskboilerplate.tests.functional.test_users" name="test_login_page" time="0.044" /><testcase classname="flaskboilerplate.tests.functional.test_users" name="test_valid_login" time="0.019"><failure message="assert b'welcome' in b'&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n&lt;head&gt;\n    &lt;!-- Required meta tags --&gt;\n    &lt;meta charset=&quot;utf-8&quot;&gt;\n    &lt;meta name=&quot;viewpo...-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;\n&lt;/body&gt;\n&lt;/html&gt;'&#10; +  where b'&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n&lt;head&gt;\n    &lt;!-- Required meta tags --&gt;\n    &lt;meta charset=&quot;utf-8&quot;&gt;\n    &lt;meta name=&quot;viewpo...-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;\n&lt;/body&gt;\n&lt;/html&gt;' = &lt;Response 4183 bytes [200 OK]&gt;.data">test_client = &lt;FlaskClient &lt;Flask 'flaskboilerplate'&gt;&gt;
+
+    def test_valid_login(test_client):
+        """
+        GIVEN a Flask application configured for testing
+        WHEN the '/login' page is posted to (POST)
+        THEN check the response is valid
+        """
+        response = test_client.post('/login',
+                                    data=dict(email='renishpp00@gmail.com', password='FlaskIsAwesome'),
+                                    follow_redirects=True)
+        assert response.status_code == 200
+&gt;       assert b'welcome' in response.data
+E       assert b'welcome' in b'&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n&lt;head&gt;\n    &lt;!-- Required meta tags --&gt;\n    &lt;meta charset="utf-8"&gt;\n    &lt;meta name="viewpo...-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"&gt;&lt;/script&gt;\n&lt;/body&gt;\n&lt;/html&gt;'
+E        +  where b'&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n&lt;head&gt;\n    &lt;!-- Required meta tags --&gt;\n    &lt;meta charset="utf-8"&gt;\n    &lt;meta name="viewpo...-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"&gt;&lt;/script&gt;\n&lt;/body&gt;\n&lt;/html&gt;' = &lt;Response 4183 bytes [200 OK]&gt;.data
+
+flaskboilerplate/tests/functional/test_users.py:23: AssertionError</failure></testcase><testcase classname="flaskboilerplate.tests.unit.test_models" name="test_new_user_with_fixture" time="0.519" /><testcase classname="flaskboilerplate.tests.unit.test_models" name="test_setting_password" time="2.064" /></testsuite></testsuites>

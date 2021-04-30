@@ -1,45 +1,41 @@
-from flask import Flask,render_template,flash,redirect,url_for,Blueprint
-from flaskboilerplate import mysql,bcrypt
-import MySQLdb.cursors
-from flaskboilerplate.users.forms  import RegistrationForm,LoginForm
-users=Blueprint('users',__name__)
+from flask import render_template, url_for, flash, redirect, request, Blueprint
+from flask_login import login_user, current_user, logout_user, login_required
+from flaskboilerplate import db, bcrypt
+from flaskboilerplate.models import User
+from flaskboilerplate.users.forms import (RegistrationForm, LoginForm)
+
+users = Blueprint('users', __name__)
 
 
 @users.route("/register", methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        flash('Already Logged In', 'success')
+        return redirect(url_for('main.home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        hashed_pswd = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE email = %s', [form.email.data])
-        account = cursor.fetchone()
-        # If account exists show error and validation checks
-        if account:
-            flash(f'Account Already Exist ', 'danger')
-        else:
-            # Account doesnt exists and the form data is valid, now insert new account into accounts table
-            cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)',
-                           (form.username.data, hashed_pswd, form.email.data))
-            mysql.connection.commit()
-            flash(f'Account Created for {form.username.data}!', 'success')
-
-        return redirect(url_for('main.home'))
-
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        db.session.add(user)
+        db.session.commit()
+        flash('Your account has been created! You are now able to log in', 'success')
+        return redirect(url_for('users.login'))
     return render_template('register.html', title='Register', form=form)
 
 
 @users.route("/login", methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        flash('Already Logged IN', 'success')
+        return redirect(url_for('main.home'))
     form = LoginForm()
-    email = form.email.data
     if form.validate_on_submit():
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE email = %s', [email])
-        account = cursor.fetchone()
-
-        if account and bcrypt.check_password_hash(account['password'], form.password.data):
-            flash('You have been logged in!!', 'success')
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            flash('Login Successful.', 'success')
             return redirect(url_for('main.home'))
         else:
-            flash('Login Unsuccessful', 'danger')
+            flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', title='Login', form=form)
+
+
